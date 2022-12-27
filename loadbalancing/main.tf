@@ -17,23 +17,46 @@ resource "aws_lb" "three_tier_lb" {
 }
 
 resource "aws_lb_target_group" "three_tier_tg" {
-  name     = "three-tier-lb-tg-${substr(uuid(), 0, 3)}"
-  port     = var.tg_port
-  protocol = var.tg_protocol
+  name     = "three-tier-lb-tg-${var.http_listener_port}"
+  port              = var.http_listener_port
+  protocol          = var.http_listener_protocol
   vpc_id   = var.vpc_id
 
   lifecycle {
-    ignore_changes        = [name]
     create_before_destroy = true
   }
 }
 
 resource "aws_lb_listener" "three_tier_lb_listener" {
   load_balancer_arn = aws_lb.three_tier_lb.arn
-  port              = var.listener_port
-  protocol          = var.listener_protocol
+  port              = var.http_listener_port
+  protocol          = var.http_listener_protocol
+#    default_action {
+#      type             = "forward"
+#      target_group_arn = aws_lb_target_group.three_tier_tg.arn
+#    }
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = var.https_listener_port
+      protocol    = var.https_listener_protocol
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+
+resource "aws_lb_listener" "front_end" {
+  load_balancer_arn = aws_lb.three_tier_lb.arn
+  port              = var.https_listener_port
+  protocol          = var.https_listener_protocol
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.cert.arn
+
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.three_tier_tg.arn
   }
 }
+

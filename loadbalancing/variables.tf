@@ -3,9 +3,10 @@
 variable "lb_sg" {}
 variable "public_subnets" {}
 variable "app_asg" {}
-variable "tg_port" {}
-variable "tg_protocol" {}
 variable "vpc_id" {}
-variable "listener_port" {}
-variable "listener_protocol" {}
+variable "http_listener_port" {}
+variable "http_listener_protocol" {}
+variable "https_listener_port" {}
+variable "https_listener_protocol" {}
 variable "azs" {}
+variable "domain_name" {}

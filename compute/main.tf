@@ -73,18 +73,15 @@ resource "aws_launch_template" "three_tier_app" {
   }
 }
 
-data "aws_lb_target_group" "three_tier_tg" {
-  name = var.lb_tg_name
-}
 
 resource "aws_autoscaling_group" "three_tier_app" {
   name                = "three_tier_app"
   vpc_zone_identifier = var.private_subnets
   min_size            = 1
-  max_size            = 1
-  desired_capacity    = 1
+  max_size            = 2
+  desired_capacity    = 2
 
-  target_group_arns = [data.aws_lb_target_group.three_tier_tg.arn]
+  target_group_arns = var.lb_tg
 
   launch_template {
     id      = aws_launch_template.three_tier_app.id
@@ -124,6 +121,7 @@ resource "aws_autoscaling_group" "three_tier_backend" {
 # AUTOSCALING ATTACHMENT FOR APP TIER TO LOADBALANCER
 
 resource "aws_autoscaling_attachment" "asg_attach" {
+  count = length(var.lb_tg)
   autoscaling_group_name = aws_autoscaling_group.three_tier_app.id
-  lb_target_group_arn    = var.lb_tg
+  lb_target_group_arn    = var.lb_tg[count.index]
 }

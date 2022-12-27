@@ -13,7 +13,11 @@ variable "dbuser" {
   sensitive = true
 }
 
-variable "dbpassword" {
+variable "secret_name" {
   type      = string
   sensitive = true
+}
+
+variable "domain_name" {
+  type = string
 }

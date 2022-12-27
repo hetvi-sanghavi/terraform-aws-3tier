@@ -13,5 +13,5 @@ output "lb_tg_name" {
 }
 
 output "lb_tg" {
-  value = aws_lb_target_group.three_tier_tg.arn
+  value = [aws_lb_target_group.three_tier_tg.arn]
 }

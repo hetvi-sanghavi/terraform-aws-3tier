@@ -33,7 +33,6 @@ module "compute" {
   bastion_instance_count = 1
   instance_type          = local.instance_type
   key_name               = "Three-Tier-Terraform"
-  lb_tg_name             = module.loadbalancing.lb_tg_name
   lb_tg                  = module.loadbalancing.lb_tg
 }
 
@@ -44,7 +43,7 @@ module "database" {
   db_instance_class    = "db.t2.micro"
   db_name              = var.db_name
   dbuser               = var.dbuser
-  dbpassword           = var.dbpassword
+  dbpassword           = jsondecode(data.aws_secretsmanager_secret_version.secret-version.secret_string)[var.dbuser]
   db_identifier        = "three-tier-db"
   skip_db_snapshot     = true
   rds_sg               = module.networking.rds_sg
@@ -52,14 +51,15 @@ module "database" {
 }
 
 module "loadbalancing" {
-  source            = "./loadbalancing"
-  lb_sg             = module.networking.lb_sg
-  public_subnets    = module.networking.public_subnets
-  tg_port           = 80
-  tg_protocol       = "HTTP"
-  vpc_id            = module.networking.vpc_id
-  app_asg           = module.compute.app_asg
-  listener_port     = 80
-  listener_protocol = "HTTP"
-  azs               = 2
+  source                  = "./loadbalancing"
+  lb_sg                   = module.networking.lb_sg
+  public_subnets          = module.networking.public_subnets
+  vpc_id                  = module.networking.vpc_id
+  app_asg                 = module.compute.app_asg
+  http_listener_port      = 80
+  http_listener_protocol  = "HTTP"
+  https_listener_port     = 443
+  https_listener_protocol = "HTTPS"
+  azs                     = 2
+  domain_name = var.domain_name
 }
