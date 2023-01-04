@@ -21,6 +21,7 @@ variable "secret_name" {
 variable "domain_name" {
   type = string
 }
+variable "dbpassword" {}
 variable "Jira_url" {
   default = "https://inductiveautomation.atlassian.net/browse/"
 }

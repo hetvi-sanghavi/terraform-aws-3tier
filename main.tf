@@ -48,8 +48,8 @@ module "database" {
   db_engine_version    = "5.7"
   db_instance_class    = "db.t2.micro"
   db_name              = var.db_name
-  dbuser               = var.dbuser
-  dbpassword           = jsondecode(data.aws_secretsmanager_secret_version.secret-version.secret_string)[var.dbuser]
+  dbuser               = jsondecode(data.aws_secretsmanager_secret_version.secret-version.secret_string)[var.dbuser]
+  dbpassword           = jsondecode(data.aws_secretsmanager_secret_version.secret-version.secret_string)[var.dbpassword]
   db_identifier        = "three-tier-db"
   skip_db_snapshot     = true
   rds_sg               = module.networking.rds_sg

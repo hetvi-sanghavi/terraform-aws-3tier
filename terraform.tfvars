@@ -1,5 +1,6 @@
 access_ip   = "0.0.0.0/0"
 db_name     = "threetierdb"
 dbuser      = "admin"
+dbpassword  = "dbpassword"
 secret_name = "dbsecret"
 domain_name = "abrakadabra123.com"
