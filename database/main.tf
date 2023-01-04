@@ -16,7 +16,7 @@ resource "aws_db_instance" "three_tier_db" {
   skip_final_snapshot    = var.skip_db_snapshot
   vpc_security_group_ids = [var.rds_sg]
 
-  tags = {
+  tags = merge({
     Name = "three-tier-db"
-  }
+  }, var.tags)
 }

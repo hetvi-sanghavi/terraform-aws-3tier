@@ -9,6 +9,11 @@ locals {
   instance_type = "t2.micro"
   location      = "us-east-1"
   vpc_cidr      = "10.0.0.0/16"
+  tags = {
+    Name      = var.user_name
+    user_name = var.user_name
+    Jira      = "${var.Jira_url}${var.ticket_number}"
+  }
 }
 
 module "networking" {
@@ -21,6 +26,7 @@ module "networking" {
   db_subnet_group    = true
   availabilityzone   = "us-east-1a"
   azs                = 2
+  tags               = local.tags
 }
 
 module "compute" {
@@ -34,6 +40,7 @@ module "compute" {
   instance_type          = local.instance_type
   key_name               = "Three-Tier-Terraform"
   lb_tg                  = module.loadbalancing.lb_tg
+  tags                   = local.tags
 }
 
 module "database" {
@@ -48,6 +55,7 @@ module "database" {
   skip_db_snapshot     = true
   rds_sg               = module.networking.rds_sg
   db_subnet_group_name = module.networking.db_subnet_group_name[0]
+  tags                 = local.tags
 }
 
 module "loadbalancing" {
@@ -61,5 +69,6 @@ module "loadbalancing" {
   https_listener_port     = 443
   https_listener_protocol = "HTTPS"
   azs                     = 2
-  domain_name = var.domain_name
+  domain_name             = var.domain_name
+  tags                    = local.tags
 }

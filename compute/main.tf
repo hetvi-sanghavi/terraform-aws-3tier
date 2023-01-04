@@ -15,9 +15,9 @@ resource "local_file" "private_file" {
 resource "aws_key_pair" "key_pair" {
   key_name   = var.key_name
   public_key = tls_private_key.private_key.public_key_openssh
-  tags = {
+  tags = merge({
     Name = "key_pair"
-  }
+  }, var.tags)
 }
 
 #Now we will create our auto scaling groups in the private subnets. We will attach our scripts to the appropriate group. The bastion auto scaling group could be set as a single instance, but we will create an autoscaling group because a failed host will be replaced automatically if EC2 health checks are failed. Finally we will attach the frontend group to the internet facing load balancer.
@@ -39,9 +39,9 @@ resource "aws_launch_template" "three_tier_bastion" {
   vpc_security_group_ids = [var.bastion_sg]
   key_name               = aws_key_pair.key_pair.key_name
 
-  tags = {
+  tags = merge({
     Name = "three_tier_bastion"
-  }
+  }, var.tags)
 }
 
 resource "aws_autoscaling_group" "three_tier_bastion" {
@@ -68,9 +68,9 @@ resource "aws_launch_template" "three_tier_app" {
   user_data              = filebase64("install_apache.sh")
   key_name               = aws_key_pair.key_pair.key_name
 
-  tags = {
+  tags = merge({
     Name = "three_tier_app"
-  }
+  }, var.tags)
 }
 
 
@@ -100,9 +100,9 @@ resource "aws_launch_template" "three_tier_backend" {
   key_name               = aws_key_pair.key_pair.key_name
   user_data              = filebase64("install_node.sh")
 
-  tags = {
+  tags = merge({
     Name = "three_tier_backend"
-  }
+  }, var.tags)
 }
 
 resource "aws_autoscaling_group" "three_tier_backend" {
@@ -121,7 +121,7 @@ resource "aws_autoscaling_group" "three_tier_backend" {
 # AUTOSCALING ATTACHMENT FOR APP TIER TO LOADBALANCER
 
 resource "aws_autoscaling_attachment" "asg_attach" {
-  count = length(var.lb_tg)
+  count                  = length(var.lb_tg)
   autoscaling_group_name = aws_autoscaling_group.three_tier_app.id
   lb_target_group_arn    = var.lb_tg[count.index]
 }

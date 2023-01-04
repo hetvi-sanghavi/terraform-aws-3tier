@@ -27,3 +27,6 @@ variable "db_subnet_group" {
 variable "availabilityzone" {}
 
 variable "azs" {}
+variable "tags" {
+  type = map(string)
+}

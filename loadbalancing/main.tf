@@ -14,12 +14,13 @@ resource "aws_lb" "three_tier_lb" {
   depends_on = [
     var.app_asg
   ]
+  tags = var.tags
 }
 
 resource "aws_lb_target_group" "three_tier_tg" {
   name     = "three-tier-lb-tg-${var.http_listener_port}"
-  port              = var.http_listener_port
-  protocol          = var.http_listener_protocol
+  port     = var.http_listener_port
+  protocol = var.http_listener_protocol
   vpc_id   = var.vpc_id
 
   lifecycle {
@@ -31,10 +32,10 @@ resource "aws_lb_listener" "three_tier_lb_listener" {
   load_balancer_arn = aws_lb.three_tier_lb.arn
   port              = var.http_listener_port
   protocol          = var.http_listener_protocol
-#    default_action {
-#      type             = "forward"
-#      target_group_arn = aws_lb_target_group.three_tier_tg.arn
-#    }
+  #    default_action {
+  #      type             = "forward"
+  #      target_group_arn = aws_lb_target_group.three_tier_tg.arn
+  #    }
   default_action {
     type = "redirect"
 

@@ -10,3 +10,6 @@ variable "https_listener_port" {}
 variable "https_listener_protocol" {}
 variable "azs" {}
 variable "domain_name" {}
+variable "tags" {
+  type = map(string)
+}

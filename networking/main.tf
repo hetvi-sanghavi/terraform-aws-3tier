@@ -12,9 +12,9 @@ resource "aws_vpc" "three_tier_vpc" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  tags = {
+  tags = merge({
     Name = "three_tier_vpc-${random_integer.random.id}"
-  }
+  }, var.tags)
   lifecycle {
     create_before_destroy = true
   }
@@ -28,9 +28,9 @@ data "aws_availability_zones" "available" {
 resource "aws_internet_gateway" "three_tier_internet_gateway" {
   vpc_id = aws_vpc.three_tier_vpc.id
 
-  tags = {
+  tags = merge({
     Name = "three_tier_igw"
-  }
+  }, var.tags)
   lifecycle {
     create_before_destroy = true
   }
@@ -48,17 +48,17 @@ resource "aws_subnet" "three_tier_public_subnets" {
   map_public_ip_on_launch = true
   availability_zone       = data.aws_availability_zones.available.names[count.index]
 
-  tags = {
+  tags = merge({
     Name = "three_tier_public_${count.index + 1}"
-  }
+  }, var.tags)
 }
 
 resource "aws_route_table" "three_tier_public_rt" {
   vpc_id = aws_vpc.three_tier_vpc.id
 
-  tags = {
+  tags = merge({
     Name = "three_tier_public"
-  }
+  }, var.tags)
 }
 
 resource "aws_route" "default_public_route" {
@@ -96,17 +96,17 @@ resource "aws_subnet" "three_tier_private_subnets" {
   map_public_ip_on_launch = false
   availability_zone       = data.aws_availability_zones.available.names[count.index]
 
-  tags = {
+  tags = merge({
     Name = "three_tier_private_${count.index + 1}"
-  }
+  }, var.tags)
 }
 
 resource "aws_route_table" "three_tier_private_rt" {
   vpc_id = aws_vpc.three_tier_vpc.id
 
-  tags = {
+  tags = merge({
     Name = "three_tier_private"
-  }
+  }, var.tags)
 }
 
 resource "aws_route" "default_private_route" {
@@ -130,9 +130,9 @@ resource "aws_subnet" "three_tier_private_subnets_db" {
   map_public_ip_on_launch = false
   availability_zone       = data.aws_availability_zones.available.names[count.index]
 
-  tags = {
+  tags = merge({
     Name = "three_tier_private_db${count.index + 1}"
-  }
+  }, var.tags)
 }
 
 #For the last part of the main.tf networking file, we will make security groups (sg) to allow proper permissions for each level. The bastion sg will allow you to connect to the bastion EC2 instance. Ideally, you would set the access_ip variable to your IP address. I have set it to allow any IP address, but that is not most secure. We have the load balancer sg, frontend app sg, backend app sg, and database sg. The description in each block tells us their purpose. I have also thrown in a database subnet group so that we can add it to our database subnets we created earlier.
@@ -158,6 +158,7 @@ resource "aws_security_group" "three_tier_bastion_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = var.tags
 }
 
 
@@ -186,6 +187,7 @@ resource "aws_security_group" "three_tier_lb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = var.tags
 }
 
 resource "aws_security_group" "three_tier_frontend_app_sg" {
@@ -213,6 +215,7 @@ resource "aws_security_group" "three_tier_frontend_app_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = var.tags
 }
 
 resource "aws_security_group" "three_tier_backend_app_sg" {
@@ -240,6 +243,8 @@ resource "aws_security_group" "three_tier_backend_app_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = var.tags
+
 }
 
 resource "aws_security_group" "three_tier_rds_sg" {
@@ -260,6 +265,7 @@ resource "aws_security_group" "three_tier_rds_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = var.tags
 }
 
 
@@ -270,7 +276,7 @@ resource "aws_db_subnet_group" "three_tier_rds_subnetgroup" {
   name       = "three_tier_rds_subnetgroup"
   subnet_ids = [aws_subnet.three_tier_private_subnets_db[0].id, aws_subnet.three_tier_private_subnets_db[1].id]
 
-  tags = {
+  tags = merge({
     Name = "three_tier_rds_sng"
-  }
+  }, var.tags)
 }

@@ -17,3 +17,6 @@ variable "bastion_instance_count" {
 variable "instance_type" {
   type = string
 }
+variable "tags" {
+  type = map(string)
+}

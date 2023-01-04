@@ -21,3 +21,8 @@ variable "secret_name" {
 variable "domain_name" {
   type = string
 }
+variable "Jira_url" {
+  default = "https://inductiveautomation.atlassian.net/browse/"
+}
+variable "ticket_number" {}
+variable "user_name" {}
