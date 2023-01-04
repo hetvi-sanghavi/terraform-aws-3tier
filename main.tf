@@ -10,7 +10,6 @@ locals {
   location      = "us-east-1"
   vpc_cidr      = "10.0.0.0/16"
   tags = {
-    Name      = var.user_name
     user_name = var.user_name
     Jira      = "${var.Jira_url}${var.ticket_number}"
   }
