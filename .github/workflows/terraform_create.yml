@@ -3,10 +3,6 @@ name: 'Terraform Create'
 on:
   workflow_dispatch:
    inputs:
-     env:
-       description: 'Pass your env name'
-       type: string
-       required: true
      user_name:
        description: 'Pass your user name'
        type: string
@@ -57,7 +53,7 @@ jobs:
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform plan -var user_name=${{ inputs.user_name }} -var ticket_number=${{ inputs.ticket_number }}  -var env=${{ inputs.env }} -input=false -out tfplan
+      run: terraform plan -var user_name=${{ inputs.user_name }} -var ticket_number=${{ inputs.ticket_number }} -input=false -out tfplan
 
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
     - name: Terraform Apply
