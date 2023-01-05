@@ -65,7 +65,7 @@ resource "aws_launch_template" "three_tier_app" {
   instance_type          = var.instance_type
   image_id               = data.aws_ssm_parameter.three-tier-ami.value
   vpc_security_group_ids = [var.frontend_app_sg]
-  user_data              = filebase64("install_apache.sh")
+  user_data              = filebase64("install_nginx.sh")
   key_name               = aws_key_pair.key_pair.key_name
 
   tags = merge({
